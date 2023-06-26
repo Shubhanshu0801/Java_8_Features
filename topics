@@ -1,0 +1,1707 @@
+Lambda Expressions
+Functional Interfaces
+Default Methods in Interfaces
+Static Methods inside Interfaces
+Predicate (Predefined Functional Interface)
+Function (Predefined Functional Interface)
+Consumer (Predefined Functional Interface)
+Supplier (Predefined Functional Interface)
+Method Reference and Constructor Reference by :: operator
+Stream API
+Date and Time API (joda API - joda.org)
+Nashorn JavaScript Engine
+
+Objectives-
+To simplify programming.
+To utilize functional programming benefits in java.
+To enable parallel programming or processing in java.
+
+Lambda Expression:
+It is an anonymous function.
+      no name
+      without return type
+      without modifiers
+
+      Example 1-
+      public void m1() {
+         System.out.println("Hello");
+      }
+      converting m1 into lambda expression
+      ()-> System.out.println("Hello");
+      *for single curly braces are not required.
+
+      Example 2-
+      public void add(int a, int b) {
+         System.out.println(a+b);
+      }
+      converting add into lambda expression
+      (a, b)-> System.out.println(a+b);
+      *if compiler can guess the type automatically then we can remove the types of arguments.
+
+      Example 3-
+      public void square(int n) {
+         return n*n;
+      }
+      converting square into lambda expression
+      n-> n*n;
+      *return keyword is used only with curly braces.
+      *if single arguments is present parenthesis is not required.
+
+      Example 4-
+      public void m1(String s) {
+         return s.length();
+      }
+      converting m1 into lambda expression
+      s-> s.length();
+
+      Test:
+      1. n-> return n*n;  ---- invalid
+      2. n-> { return n*n; }; ---- valid
+      3. n-> { return n*n }; ---- invalid
+      4. n-> { n*n; }; ---- invalid
+      5. n-> n*n; ---- valid
+      *without curly braces we can't use return keyword.
+
+Functional Interfaces:
+An interface which contain single abstract method.
+It can contain any no. of default and abstract methods.
+To specify a functional interface @FunctionalInterface annotation can be used (not mandatory).
+To invoke lambda expression functional interface must be required.
+Example -
+Runnable - run()
+Comparable - compareTo()
+Comparator - compare()
+ActionListener - actionPerformed()
+Callable - Call()
+
+      Functional interface with respect to inheritance
+      Example 1-
+      @FunctionalInterface
+      interface A {
+         public void m1();
+      }
+      @FunctionalInterface
+      interface B extends A {
+      }
+      *interface A and B both are valid.
+      *A contains single abstract method.
+      *method m1 is by default available to B because of inheritance.
+
+      Example 2-
+      @FunctionalInterface
+      interface A {
+         public void m1();
+      }
+      @FunctionalInterface
+      interface B extends A {
+         public void m1();
+      }
+      *interface A and B both are valid.
+      *A contains single abstract method.
+      *B contains single abstract method. method m1 is overridden in B.
+
+      Example 3-
+      @FunctionalInterface
+      interface A {
+         public void m1();
+      }
+      @FunctionalInterface
+      interface B extends A {
+         public void m2();
+      }
+      *interface A is valid and B is invalid.
+
+      Example 4-
+      @FunctionalInterface
+      interface A {
+         public void m1();
+      }
+      interface B extends A {
+         public void m1();
+      }
+      *Both interfaces are valid.
+      *A contains single abstract method.
+      *B is not a functional interface. Annotation @FunctionalInterface is not used for B.
+
+      Using Lambda Expression with functional interface:
+      Example 1-
+      public class Test {
+	     public static void main(String[] args) {
+		    Demo d = new Demo();
+		    d.m1();
+	     }
+      }
+      class Demo implements Interface {
+	     public void m1() {
+		    System.out.println("Hello");
+	     }
+      }
+      @FunctionalInterface
+      interface Interface {
+	     public void m1();
+      }
+      implementing lambda expression instead of using separate implementation class
+      public class Test {
+	     public static void main(String[] args) {
+		    Interface i = ()-> System.out.println("Hello by lambda expression");
+		    i.m1();
+	     }
+      }
+      @FunctionalInterface
+      interface Interface {
+	     public void m1();
+      }
+      *To provide reference to the lambda expression functional interface is required.
+
+      Example 2-
+      public class Test {
+	     public static void main(String[] args) {
+		    Interface i = (a, b)-> System.out.println(a+b);
+		    i.add(3,4);
+	     }
+      }
+      @FunctionalInterface
+      interface Interface {
+	     public void add(int a, int b);
+      }
+      *No effect on performance because execution happens in run time.
+      *No separate .class will be generated for lambda expression.
+
+      Lambda Expression with MultiThreading:
+      *We can define a thread by two ways-
+         1. By implementing Runnable interface.
+         2. By extending Thread class.
+
+      public class Test {
+	     public static void main(String[] args) {
+		    MyRunnable r = new MyRunnable();
+		    Thread t =new Thread(r);
+		    t.start();
+		       for(int i=0; i<10; i++) {
+			      System.out.println("main thread");
+		       }
+	     }
+      }
+      class MyRunnable implements Runnable {
+	     public void run() {
+		    for(int i=0; i<10; i++) {
+			   System.out.println("child thread");
+		    }
+	     }
+      }
+      implementing lambda expression instead of using separate implementation class
+      public class Test {
+	     public static void main(String[] args) {
+		    Runnable r = ()-> {
+			   for(int i=0; i<10; i++) {
+				System.out.println("child thread");
+			   }
+		    };
+		    Thread t = new Thread(r);
+		    t.start();
+		    for (int i = 0; i < 10; i++) {
+			   System.out.println("main thread");
+		    }
+	     }
+      }
+
+      Collections with lambda expression
+      public class CollectionsWithLambdaExpression {
+	     public static void main(String[] args) {
+		    ArrayList<Integer> l = new ArrayList<>();
+		    l.add(20);
+		    l.add(10);
+		    l.add(25);
+		    l.add(0);
+		    l.add(15);
+		    l.add(5);
+		    System.out.println(l);
+		    Collections.sort(l, new MyComparator());
+		    System.out.println(l);
+	     }
+      }
+      class MyComparator implements Comparator<Integer> {
+	     public int compare(Integer I1, Integer I2) {
+		    if(I1<I2) {
+			   return -1;
+		    }
+		    else if(I1>I2) {
+			   return +1;
+		    }
+		    else {
+			   return 0;
+		    }
+	     }
+      }
+      implementing lambda expression in Collections
+      public class CollectionsWithLambdaExpression {
+	     public static void main(String[] args) {
+		    ArrayList<Integer> l = new ArrayList<>();
+		    l.add(20);
+		    l.add(10);
+		    l.add(25);
+		    l.add(0);
+		    l.add(15);
+		    l.add(5);
+		    System.out.println(l);
+		    Comparator<Integer> c = (I1, I2)-> (I1<I2)?-1:(I1>I2)?1:0;
+		    Collections.sort(l, c);
+		    System.out.println(l);
+	     }
+      }
+      *Comparator interface contains only compare method.
+      *int compare(Object obj1, Object obj2).
+         1. returns -ve iff obj1 has to come before obj2
+         2. returns +ve iff obj1 has to come after obj2.
+         3. returns 0 iff obj1 and obj2 are equal.
+
+      Anonymous Inner Class Vs Lambda Expression:
+      Thread t = new Thread() {
+         ........
+      };
+      *This is an anonymous inner class and its object is created.
+      *This anonymous inner class is extending Thread class.
+
+      Runnable r = new Runnable() {
+         ........
+      };
+      *This is an anonymous inner class and its object is created.
+      *This anonymous inner class is implementing Runnable interface.
+
+      public class AnonymousInnerClassWithLambdaExpression {
+	     public static void main(String[] args) {
+		    Runnable r = new Runnable() {
+			   public void run() {
+			      for(int i=0; i<10; i++) {
+				     System.out.println("child thread");
+				  }
+			   }
+		 };
+		    Thread t = new Thread(r);
+		    t.start();
+		    for(int i=0; i<10; i++) {
+	           System.out.println("main thread");
+		    }
+	     }
+      }
+      *Since Runnable is a functional interface we can replace it with lambda expression.
+      public class AnonymousInnerClassWithLambdaExpression {
+	     public static void main(String[] args) {
+		    Runnable r = ()-> {
+			   for (int i=0; i<10; i++) {
+			      System.out.println("child thread");
+			   }
+		    };
+
+		    Thread t = new Thread(r);
+		    t.start();
+		    for(int i=0; i<10; i++) {
+			   System.out.println("main thread");
+		    }
+	     }
+      }
+
+      *Anonymous inner class is more powerful than lambda expressions.
+      interface A {
+         public void m1();
+         public void m2();
+      }
+      *We cannot use lambda expression here but anonymous class can be used.
+      *If anonymous inner class implements functional interface
+      *In the above case anonymous inner class can be replaced with lambda expression otherwise not.
+
+Default methods inside interface | Virtual Extension Method | Defender Method:
+Until 1.7v every method inside interface is always public and abstract(declaring or not).
+      void m1();
+      public void m1();
+      abstract void m1();
+      public abstract void m1();
+      *All are same.
+From 1.8v default and static methods are also allowed inside interface.
+From 1.9v private methods are allowed inside interface.
+Wrt variables:
+      *variables are always public static final inside interface(declaring or not).
+      interface Interface {
+	     public void m1();
+	     public void m2();
+      }
+      class Test1 implements Interface {
+	     public void m1() {
+	     }
+	     public void m2() {
+	     }
+      }
+      class Test2 implements Interface {
+	     public void m1() {
+	     }
+	     public void m2() {
+	     }
+      }
+      class Test3 implements Interface {
+	     public void m1() {
+	     }
+	     public void m2() {
+	     }
+      }
+      class Test100 implements Interface {
+	     public void m1() {
+	     }
+	     public void m2() {
+	     }
+      }
+      *If we add a new abstract method inside interface
+      *All implementation classes have to provide its implementation.
+      *Without effecting implementation classes if we want to add a method inside interface,
+      we should go for default methods.
+      *Classes can override the default method.Not necessary to provide its implementation.
+      interface Interface {
+         public void m1();
+         public void m2();
+         default void m3() {
+            System.out.println("default method");
+         }
+      }
+      *The keyword default is not a modifier.
+      interface Interface {
+	     public void m1();
+	     public void m2();
+	     default int hashCode() {
+	     }
+      }
+      *It is not allowed to define Object class method as default method inside interface.
+      *This is because Object class method is by default available to every class.
+      *Java does not support multiple inheritance in case of class.
+      *Java supports multiple inheritance in case of interface(even in case of default method).
+
+      interface Left {
+	     default void m1() {
+		    System.out.println("Left method");
+	     }
+      }
+      interface Right {
+	     default void m1() {
+		    System.out.println("Right method");
+	     }
+      }
+      public class Test implements Left, Right{
+	     public static void main(String[] args) {
+		    Test t = new Test();
+		    t.m1();
+	     }
+	     public void m1() {
+		    System.out.println("Overridden method");-> To call m1 method of implementation class
+		    Left.super.m1();-> To call left interface m1 method
+		    Right.super.m1();-> To call Right interface m1 method
+	     }
+      }
+
+Static Method:
+      interface Interface {
+	     public static void m1() {
+		    System.out.println("Interface static method");
+	     }
+      }
+      public class Test implements Interface{
+	     public static void main(String[] args) {
+		    Interface.m1();-> Only valid way to call m1 method
+		    m1();-> Invalid way to call
+		    Test.m1();-> Invalid way to call
+		    Test t = new Test();
+		    t.m1();-> Invalid way to call
+	     }
+      }
+      *Static method inside interface is not available to implementation classes by default.
+      *If class doesn't implement interface having static method,method can be used by interface name.
+      interface Interface {
+	     public static void m1() {
+		    System.out.println("Interface static method");
+	     }
+      }
+      public class Test {
+	     public static void main(String[] args) {
+		    Interface.m1();-> Only valid way to call m1 method
+	     }
+      }
+      *From 1.8v interface can contain main method also.
+      interface InterfaceMain {
+	     public static void main(String[] args) {
+		    System.out.println("interface main method");
+	     }
+      }
+      *If every method is static, it is better to define the methods inside interface.
+      *To define general utility methods(not related to objects)-> objective.
+
+Predefined Functional Interfaces:
+Predicate(FI):
+It is used where we require conditional checks.
+It contains single abstract method test().
+Predicate can take only one input argument. Example- Predicate<String>
+Return type of test method is boolean.
+      public abstract boolean test(T t)
+      interface Predicate<t> {
+         public boolean test(T t);
+      }
+
+      *implementation of test method in class according to requirement
+      public boolean test(Integer i) {
+         if(i%2==0) {
+            return true;
+         }
+         else {
+            return false;
+         }
+      }
+      implementing lambda expression to above implementation of test method
+      i-> i%2==0;
+
+      Example 1-
+      public class Test {
+         public static void main(String[] args) {
+            Predicate<Integer> p = i-> i%2==0;
+            System.out.println(p.test(19));
+            System.out.println(p.test(20));
+         }
+      }
+      output-
+      false
+      true
+
+      Example 2-
+      public class Test {
+         public static void main(String[] args) {
+            Predicate<Employee> p = e-> e.salary>10000 && e.employeeId<109;
+            System.out.println(p.test(e));
+         }
+      }
+
+      Example 3-
+      public class StringPredicate {
+         public static void main(String[] args) {
+            String[] s = {"Shubhanshu", "Ishani", "Himanshu", "Pawan"};
+            Predicate<String> p = s1-> s1.length() < 8;
+            for (String s1: s) {
+               if (p.test(s1)) {
+                  System.out.println(s1);
+               }
+            }
+         }
+      }
+      output:
+      Ishani
+      Pawan
+
+      Example 4-
+      public class StringPredicate {
+         public static void main(String[] args) {
+            String[] s = {"Shubhanshu", "Ishani", "Himanshu", "Pawan"};
+            Predicate<String> p = s1-> s1.length()%2==0;
+            for (String s1: s) {
+               if (p.test(s1)) {
+                  System.out.println(s1);
+               }
+            }
+         }
+      }
+      output:
+      Shubhanshu
+      Ishani
+      Himanshu
+
+      Example 5-
+      public class StudentPredicate {
+         public static void main(String[] args) {
+            ArrayList<Student> l = new ArrayList<>();
+            l.add(new Student("Durga", 101));
+            l.add(new Student("Ravi", 102));
+            l.add(new Student("Shiva", 103));
+            l.add(new Student("Adarsh", 104));
+            l.add(new Student("Sagar", 105));
+            Predicate<Student> p = s-> s.rollNumber>103;
+            for (Student s1: l) {
+               if(p.test(s1)) {
+                      System.out.println(s1.name + ":" + s1.rollNumber);
+               }
+            }
+         }
+      }
+      class Student {
+         String name;
+         int rollNumber;
+         Student(String name, int rollNumber) {
+            this.name = name;
+            this.rollNumber = rollNumber;
+         }
+      }
+      output:
+      Adarsh:104
+      Sagar:105
+
+      Example 6- We can join two predicates using and(), or(), negate()
+      public class JoiningPredicate {
+         public static void main(String[] args) {
+            int[] x = {5, 10, 15, 20 , 25, 30};
+            Predicate<Integer> p1 = i-> i%2==0;
+            Predicate<Integer> p2 = i-> i>10;
+            //and(), or(), negate()
+            System.out.println("The numbers which are even and greater than 10 are:");
+            for(int x1: x) {
+               if(p1.and(p2).test(x1)) {
+                  System.out.println(x1);
+               }
+            }
+            System.out.println("The numbers which are even or greater than 10 are:");
+            for(int x1: x) {
+               if(p1.or(p2).test(x1)) {
+                  System.out.println(x1);
+               }
+            }
+            System.out.println("The numbers which are not even are:");
+            for(int x1: x) {
+               if(p1.negate().test(x1)) {
+                  System.out.println(x1);
+               }
+            }
+         }
+      }
+      output:
+      The numbers which are even and greater than 10 are:
+      20
+      30
+      The numbers which are even or greater than 10 are:
+      10
+      15
+      20
+      25
+      30
+      The numbers which are not even are:
+      5
+      15
+      25
+
+Function:
+It is used where an operation is performed and returns result.
+It can take two input arguments. Function<T, R>
+It contains single abstract method apply().
+Return type of apply method can be anything.
+      interface Function<T, R> {
+         Public R apply(T t) {
+            //Perform operation
+            //Return result
+         }
+      }
+
+      Example 1-Take Integer value as input and return its square.
+      public class Test {
+         public static void main(String[] args) {
+            Function<Integer, Integer> f = i-> i*i;
+            System.out.println(f.apply(4));
+            System.out.println(f.apply(5));
+         }
+      }
+      output:
+      16
+      25
+
+      Example 2-Take String value as input and return its length.
+      public class Test {
+         public static void main(String[] args) {
+            Function<String, Integer> f = s-> s.length();
+            System.out.println(f.apply("Anshu"));
+            System.out.println(f.apply("Ishani"));
+         }
+      }
+      output:
+      5
+      6
+
+      Example 3-Take String value as input and return String in upper case.
+      public class Test {
+         public static void main(String[] args) {
+            Function<String, String> f = s-> s.toUpperCase();
+            System.out.println(f.apply("durga software solutions"));
+         }
+      }
+      output:
+      DURGA SOFTWARE SOLUTIONS
+
+      Example 4- Take Student type as input and return grade. Also print name and marks
+      public class StudentFunction {
+         public static void main(String[] args) {
+            Function<Students, String> f = s-> {
+               int marks = s.marks;
+               String grade = "";
+               if (marks>=80) {
+                  grade = "A(Distinction)";
+               }
+               else if (marks>=60) {
+                  grade = "B(First Class)";
+               }
+               else if(marks>=50) {
+                  grade = "C(Second Class)";
+               }
+               else if(marks>=35) {
+                  grade = "D(Third Class)";
+               }
+               else {
+                  grade = "E(Fail)";
+               }
+               return grade;
+            };
+            Predicate<Students> p = s-> s.marks>=60;
+            Students[] s = {new Students("Durga", 100),
+                            new Students("Ravi", 65),
+                            new Students("Shiva", 55),
+                            new Students("Adarsh", 45),
+                            new Students("sagar", 25),
+            };
+            for(Students s1: s) {
+               if (p.test(s1)) {
+                  System.out.println("Student name: " + s1.name);
+                  System.out.println("Student marks: " + s1.marks);
+                  System.out.println("Student grade: " + f.apply(s1));
+               }
+            }
+         }
+      }
+      class Students {
+         String name;
+         int marks;
+         Students(String name, int marks) {
+            this.name = name;
+            this.marks = marks;
+         }
+      }
+
+      Example 5-Function Chaining
+      f1.addThen(f2).apply(i)-> execute f1 and then f2
+      f1.compose(f2).apply(i)-> execute f2 and then f1
+      public class FunctionChaining {
+         public static void main(String[] args) {
+            Function<Integer, Integer> f1 = i-> 2*i;
+            Function<Integer, Integer> f2 = i->i*i*i;
+            System.out.println(f1.andThen(f2).apply(2));
+            System.out.println(f1.compose(f2).apply(2));
+         }
+      }
+      output:
+      64
+      16
+
+Consumer:
+It takes an input and perform some operation.
+It does not return anything.
+It contains single method accept().
+Return type is void.
+      interface Consumer<T> {
+         public void accept();
+      }
+
+      Example 1-
+      public class Test {
+         public static void main(String[] args) {
+            Consumer<String> c = s-> System.out.println(s);
+            c.accept("Anshu");
+            c.accept("Durga");
+         }
+      }
+      output:
+      Anshu
+      Durga
+
+      Example 2-Given the vehicle object and return the speed type(how fast a vehicle is).
+      public class VehicleConsumer {
+         public static void main(String[] args) {
+            Vehicle[] v = {new Vehicle(300, "Sports Car"),
+                           new Vehicle(220, "Car"),
+                           new Vehicle(180, "Bike"),
+                           new Vehicle(120, "Truck"),
+                           new Vehicle(80, "Bicycle")
+            };
+            Function<Vehicle, String> function = v1 -> {
+               String speedType;
+               int topSpeed = v1.topSpeed;
+               if (topSpeed >= 230) {
+                  speedType = "Very Very Fast";
+               }
+               else if (topSpeed >= 190) {
+                  speedType = "Very Fast";
+               }
+               else if (topSpeed >= 130) {
+                  speedType = "Fast";
+               }
+               else if (topSpeed >= 90) {
+                  speedType = "Slow";
+               }
+               else {
+                  speedType = "Very slow";
+               }
+               return speedType;
+            };
+            Predicate<Vehicle> predicate = v1 -> v1.topSpeed >= 130;
+            Consumer<Vehicle> consumer = v1 -> {
+               System.out.println("Vehicle Speed:" + v1.topSpeed);
+               System.out.println("Vehicle Type:" + v1.type);
+               System.out.println("Vehicle Speed Type:" + function.apply(v1));
+               System.out.println();
+            };
+            for (Vehicle v2 : v) {
+               if(predicate.test(v2)) {
+                  consumer.accept(v2);
+               }
+            }
+         }
+      }
+      class Vehicle {
+         int topSpeed;
+         String type;
+         Vehicle(int topSpeed, String type) {
+            this.topSpeed = topSpeed;
+            this.type = type;
+         }
+      }
+
+      Example 3- Consumer Chaining
+      public class ConsumerChaining {
+         public static void main(String[] args) {
+            Consumer<Movie> c1 = m-> System.out.println(m.name + " is ready to release");
+            Consumer<Movie> c2 = m-> System.out.println(m.name + " is released");
+            Consumer<Movie> c3 = m-> System.out.println(m.name + " is going to release next year");
+            Movie m = new Movie("Fauda");
+            c1.andThen(c2).andThen(c3).accept(m);
+         }
+      }
+      class Movie {
+         String name;
+         Movie(String name) {
+            this.name = name;
+         }
+      }
+      output:
+      Fauda is ready to release
+      Fauda is released
+      Fauda is going to release next year
+
+Supplier:
+It supply a required object and won't take any input.
+It contains get method.
+Return type of get method could be anything.
+      interface Supplier<R> {
+         public R get();
+      }
+
+      Example 1-
+      public class Test {
+         public static void main(String[] args) {
+            Supplier<Date> s = ()-> new Date();
+            System.out.println(s.get());
+         }
+      }
+      output:
+      Wed May 17 00:09:57 IST 2023 // prints current date.
+
+      Example 2- Supplier - To generate OTP
+      *To generate random otp we will use random() of Math class.
+      *Every time this method give a random number.
+      *Range of this method- 0<=x<1.
+      public class SupplierGenerateOTP {
+         public static void main(String[] args) {
+            Supplier<String> s = ()-> {
+               String otp = "";
+               for(int i=0; i<6; i++) {
+                  otp = otp + (int) (Math.random() * 10);
+               }
+               return otp;
+            };
+            System.out.println(s.get());
+            System.out.println(s.get());
+            System.out.println(s.get());
+            System.out.println(s.get());
+             System.out.println(s.get());
+          }
+      }
+      output:
+      517759
+      342513
+      520624
+      586792
+      717360
+      *Every time it will generate random OTP.
+
+BiPredicate:
+In Predicate we take one input.
+In BiPredicate we take two inputs and perform some conditional checks.
+      interface BiPredicate<T1, T2> {
+         public boolean test(T1 t1, T2 t2);
+      }
+
+      Example 1-Sum of two numbers is even or not
+      public class BiPredicate {
+         public static void main(String[] args) {
+            BiPredicate<Integer, Integer> bp = (a, b)-> (a+b)%2==0;
+            System.out.println(bp.test(10, 20));
+            System.out.println(bp.test(10, 25));
+         }
+      }
+      output:
+      true
+      false
+
+BiFunction:
+It takes two input arguments and Perform some operations.
+It return something.
+      interface BiFunction<T, U, R> {
+         public R apply(T t, U u);
+      }
+      *T and U are input types and R is return type.
+
+      Example:Take two inputs name and subject of teacher and returns teacher object.
+      public class BiFunctionExample {
+         public static void main(String[] args) {
+            ArrayList<Teacher> l = new ArrayList<>();
+            BiFunction<String, String, Teacher> b = (name, subject)-> new Teacher(name, subject);
+            l.add(b.apply("Anshu", "General Studies"));
+            l.add(b.apply("Ishani", "English"));
+            for(Teacher t: l) {
+               System.out.println("Teacher name: " + t.name);
+               System.out.println("Teacher's subject : " + t.subject);
+               System.out.println();
+            }
+         }
+      }
+      output:
+      Teacher name: Anshu
+      Teacher's subject : General Studies
+
+      Teacher name: Ishani
+      Teacher's subject : English
+
+BiConsumer:
+It takes two inputs and perform some operation.
+It does not return anything.
+      interface BiConsumer<T, U> {
+         public void accept(T t, U u);
+      }
+
+      Example:
+      public class BiConsumerExample {
+         public static void main(String[] args) {
+            ArrayList<Teachers> l = new ArrayList<>();
+            populate(l);
+            BiConsumer<Teachers, Double> biConsumer = (t, d)-> t.salary = t.salary + d;
+            for(Teachers t: l) {
+               biConsumer.accept(t, 500.0);
+            }
+            for(Teachers t: l) {
+               System.out.println("Teacher name: " + t.name);
+               System.out.println("Teacher's Salary: " + t.salary);
+               System.out.println();
+            }
+         }
+         public static void populate(ArrayList<Teachers> l) {
+            l.add(new Teachers("Anshu", 25000));
+            l.add(new Teachers("Ishani", 24000));
+         }
+      }
+      class Teachers {
+         String name;
+         double salary;
+         Teachers(String name, double salary) {
+            this.name = name;
+            this.salary = salary;
+         }
+      }
+
+Primitive versions of Functional interfaces:
+      Predicate<Integer> p = i-> i%2=0;
+      System.out.println(p.test(10));
+      *In this example int(primitive) is converted to Integer type(object)---> autoboxing.
+      *Again, Integer(object) is converted to int(primitive)---> autounboxing.
+      *This cause performance problems.
+      To overcome this problem, we should go for primitive functional interface.
+Primitive Predicates:
+IntPredicate:
+Takes int type as input and return boolean value.
+      Example-
+      public class Test {
+         public static void main(String[] args) {
+            int[] x = {5, 10, 15, 20, 25, 30};
+            IntPredicate p = i-> i%2==0;
+            for(int x1: x) {
+               if(p.test(x1)) {
+                  System.out.println(x1);
+               }
+            }
+         }
+      }
+      output:
+      10
+      20
+      30
+
+DoublePredicate:
+Takes double type as input and return boolean value.
+
+LongPredicate:
+Takes long type as input and return boolean value.
+
+Primitive Function:
+DoubleFunction:
+Takes double type as input and can return anything.
+
+IntFunction:
+Takes int type as input and can return anything.
+
+LongFunction:
+Takes long type as input and can return anything.
+
+DoubleToIntFunction:
+Takes double type as input and return type int.
+Method present inside this interface is
+      applyAsInt(double d)
+
+DoubleToLongFunction:
+Takes double type as input and return type long.
+Method present inside this interface is
+      applyAsLong(double d)
+
+IntToDoubleFunction:
+Takes int type as input and return type double.
+Method present inside this interface is
+      applyAsDouble(int i)
+
+IntToLongFunction:
+Takes int type as input and return type long.
+Method present inside this interface is
+      applyAsLong(int i)
+
+LongToDoubleFunction:
+Takes long type as input and return type double.
+Method present inside this interface is
+      applyAsDouble(long l)
+
+LongToIntFunction:
+Takes long type as input and return type int.
+Method present inside this interface is
+      applyAsInt(long l)
+
+ToIntFunction:
+Takes anything as input and return type int.
+Method present inside this interface is
+      applyAsInt(T t)
+
+ToDoubleFunction:
+Takes anything as input and return type double.
+Method present inside this interface is
+      applyAsDouble(T t)
+
+ToLongFunction:
+Takes anything as input and return type long.
+Method present inside this interface is
+      applyAsLong(T t)
+
+ToIntBiFunction:
+Takes two inputs of any type and return type int.
+Method present inside this interface is
+      applyAsInt(T t, U u)
+
+ToDoubleBiFunction:
+Takes two inputs of any type and return type double.
+Method present inside this interface is
+      applyAsDouble(T t, U u)
+
+ToLongBiFunction:
+Takes two inputs of any type and return type long.
+Method present inside this interface is
+      applyAsLong(T t, U u)
+
+Primitive Consumers:
+DoubleConsumer:
+Takes double as input and return type is void.
+Method present inside this interface is
+      accept(double d)
+
+IntConsumer:
+Takes int as input and return type is void.
+Method present inside this interface is
+      accept(int i)
+
+LongConsumer:
+Takes long as input and return type is void.
+Method present inside this interface is
+      accept(long l)
+
+ObjDoubleConsumer:
+Take two inputs and one must be double and return type is void.
+Method present inside this interface is
+      accept(T t, double d)
+
+ObjIntConsumer:
+Take two inputs and one must be int and return type is void.
+Method present inside this interface is
+      accept(T t, int i)
+
+ObjLongConsumer:
+Take two inputs and one must be long and return type is void.
+Method present inside this interface is
+      accept(T t, long l)
+
+Primitive Supplier:
+BooleanSupplier:
+No input and return type is boolean.
+Method present inside this interface is
+      getAsBoolean()
+
+IntSupplier:
+No input and return type is int.
+Method present inside this interface is
+      getAsInt()
+
+DoubleSupplier:
+No input and return type is double.
+Method present inside this interface is
+      getAsDouble()
+
+LongSupplier:
+No input and return type is long.
+Method present inside this interface is
+      getAsLong()
+
+UnaryOperator:
+If input and output are same, we should go for UnaryOperator.
+It is the child of Function<T, T>
+      Example:
+      public class Test {
+         public static void main(String[] args) {
+            UnaryOperator<Integer> u = i-> i*i;
+            System.out.println(u.apply(10));
+         }
+      }
+      output:
+      100
+
+Primitives for UnaryOperator:
+IntUnaryOperator:
+Input type int and return type int.
+Method present inside this interface is
+      int applyAsInt(int i)
+
+DoubleUnaryOperator:
+Input type double and return type double.
+Method present inside this interface is
+      double applyAsDouble(double d)
+
+LongUnaryOperator:
+Input type long and return type long.
+Method present inside this interface is
+      long applyAsLong(long l)
+
+BinaryOperator:
+Takes two inputs of same type and return type is also same.
+It is the child of BiFunction<T, T, T>
+Method present inside this interface is
+      T apply(T t1, T t2)
+
+Primitive of BinaryOperator:
+IntBinaryOperator:
+Takes two input of int type and return type is also int.
+Method present inside this interface is
+      int applyAsInt(int i1, int i2)
+
+DoubleBinaryOperator:
+Takes two input of double type and return type is also double.
+Method present inside this interface is
+      double applyAsDouble(double d1, double d2)
+
+LongBinaryOperator:
+Takes two input of long type and return type is also long.
+Method present inside this interface is
+      long applyAsLong(long l1, long l2)
+
+      Example:
+      public class Test {
+         public static void main(String[] args) {
+            IntUnaryOperator f1 = i-> i+1;
+            IntUnaryOperator f2 = i-> i*i;
+            System.out.println(f1.applyAsInt(4));
+            System.out.println(f2.applyAsInt(4));
+            System.out.println(f1.andThen(f2).applyAsInt(4));
+         }
+      }
+      output:
+      5
+      16
+      25
+
+Method reference and Constructor reference:
+Method reference:
+It is used to refer method of functional interface.
+It can be used to replace the lambda expression.
+Wherever the implementation is already available we can use method reference instead of lambda expression.
+The method which is referred to can be static or instance and has any modifier.
+The only restriction is the argument- argument must be same.
+Advantage: code reusability
+      Example:
+      @FunctionalInterface
+      interface Addition {
+         public void add(int a, int b);
+      }
+      public class MethodReferenceExample {
+         public static void sum(int x, int y) {
+            System.out.println("the sum is: " + (x+y));
+         }
+         public static void main(String[] args) {
+            Addition addition = (a, b)->System.out.println(a+b);
+            addition.add(10, 20);
+            //functional interface add method is referring to class sum method.
+            Addition  addition1 = MethodReferenceExample::sum;
+            addition1.add(100, 200);
+         }
+      }
+      output:
+      30
+      the sum is: 300
+
+Constructor reference:
+If functional interface method returns an object, we can use constructor reference.
+Functional interface method and constructor must have same argument.
+Here functional interface method is referring to class constructor.
+      Example 1-
+      class Sample {
+         Sample() {
+            System.out.println("Sample class constructor executed...");
+         }
+      }
+      interface Interface {
+         public Sample get();
+      }
+      class Test {
+         public static void main(String[] args) {
+            Interface i = Sample::new;
+            Sample s = i.get();
+         }
+      }
+      output:
+      Sample class constructor executed...
+
+      Example 2-
+      class Sample {
+         Sample(String s) {
+            System.out.println("Sample class constructor executed with argument " + s);
+         }
+      }
+      interface Interface {
+         public Sample get(String s);
+      }
+      class Test {
+         public static void main(String[] args) {
+            Interface i = Sample::new;
+            Sample s = i.get("Anshu");
+            }
+         }
+      }
+      output:
+      Sample class constructor executed with argument Anshu
+
+      Comparison between separate implementation class, lambda expression and constructor reference:
+      1. If we take separate implementation class
+      public class Test {
+         public static void main(String[] args) {
+
+         }
+      }
+      class School {
+         String name;
+         String area;
+         School(String name, String area) {
+            this.name = name;
+            this.area = area;
+         }
+      }
+      interface SchoolInterface {
+         public School get(String name, String area);
+      }
+      class Demo implements SchoolInterface {
+         public School get(String name, String area) {
+            School s = new School("Kendriya Vidyalaya", "Jhagakhand");
+            return s;
+         }
+      }
+
+      2. If we use lambda expression
+      public class Test {
+         public static void main(String[] args) {
+            SchoolInterface i = (name, area)-> new School("Kendriya Vidyalaya", "jhagrakhand");
+         }
+      }
+      class School {
+         String name;
+         String area;
+         School(String name, String area) {
+            this.name = name;
+            this.area = area;
+         }
+      }
+      interface SchoolInterface {
+         public School get(String name, String area);
+      }
+
+      3. If we use constructor reference
+      public class Test {
+         public static void main(String[] args) {
+            SchoolInterface i = School::new;
+         }
+      }
+      class School {
+         String name;
+         String area;
+         School(String name, String area) {
+            this.name = name;
+            this.area = area;
+         }
+      }
+      interface SchoolInterface {
+         public School get(String name, String area);
+      }
+      *So we can write concise code using constructor reference.
+
+Streams:
+If we want to represent a group of objects as a single entity-- Collections.
+If we want to process objects from the Collection-- Streams.
+To get the stream we use stream() method.
+      Stream s = c.stream(); //c is collection object.
+Present in java.util.stream package.
+filter(Predicate):
+If we want to filter elements from the stream based on some conditional checks, we use filter().
+input - 10 elements
+output - elements<=10
+      Example-
+      public class Test {
+         public static void main(String[] args) {
+            ArrayList<Integer> l = new ArrayList<>();
+            l.add(10);
+            l.add(25);
+            l.add(5);
+            l.add(15);
+            l.add(30);
+            l.add(20);
+            System.out.println(l);
+            List<Integer> l1 = l.stream().filter(i->i%2==0).collect(Collectors.toList());
+            System.out.println(l1);
+         }
+      }
+      output:
+      [10, 25, 5, 15, 30, 20]--contains 6 elements
+      [10, 30, 20]--contains 3 elements
+
+map(Function):
+If we want to perform some operations on every element present in stream,we use map() method.
+input - 10 elements
+output - 10 elements
+      Example-To add grace marks to every marks.
+      public class Test {
+         public static void main(String[] args) {
+            ArrayList<Integer> marks = new ArrayList<>();
+            marks.add(10);
+            marks.add(25);
+            marks.add(5);
+            marks.add(15);
+            marks.add(30);
+            marks.add(20);
+            System.out.println(marks);
+            List<Integer> updatedMarks = marks.stream().map(i->i+5).collect(Collectors.toList());
+            System.out.println(updatedMarks);
+         }
+      }
+      output:
+      [10, 25, 5, 15, 30, 20]
+      [15, 30, 10, 20, 35, 25]
+
+collect(Collectors.toList()):
+If we want to collect the result after some conditional checks or after some performed operations.
+      List l = marks.stream().map(i->i+5).collect(Collectors.toList());
+      List l = l.stream().filter(i->i%2==0).collect(Collectors.toList());
+
+count():
+To get a count of elements present in the stream.
+      Example-
+      public class Test {
+         public static void main(String[] args) {
+            ArrayList<Integer> marks = new ArrayList<>();
+            marks.add(70);
+            marks.add(45);
+            marks.add(10);
+            marks.add(65);
+            marks.add(20);
+            marks.add(87);
+            System.out.println(marks);
+            long noOfFailedStudents = marks.stream().filter(m->m<35).count();
+            System.out.println(noOfFailedStudents);
+         }
+      }
+      output:
+      [70, 45, 10, 65, 20, 87]
+      2
+
+sorted():
+To sort(default natural sorting order) the elements present in the stream.
+In default natural sorting order, internally, compareTo() method is called of Comparable interface.
+sorted(Comparator c):
+To sort according to the requirements.
+      Example 1-
+      public class Test {
+         public static void main(String[] args) {
+            ArrayList<Integer> marks = new ArrayList<>();
+            marks.add(70);
+            marks.add(45);
+            marks.add(10);
+            marks.add(65);
+            marks.add(20);
+            marks.add(87);
+            System.out.println(marks);
+            //Both will give the same output
+            1. List sortedList = marks.stream().sorted().collect(Collectors.toList());
+            2. List sortedList = marks.stream().sorted((i1.i2)-> i1.compareTo(i2)).collect(Collectors.toList());
+            //This will give opposite output. add - symbol -i1.compareTo(i2) or interchange arguments i2.compareTo(i1).
+            3. List sortedList = marks.stream().sorted((i1.i2)-> -i1.compareTo(i2)).collect(Collectors.toList());
+            System.out.println(sortedList);
+         }
+      }
+      output:
+      [70, 45, 10, 65, 20, 87]
+      [10, 20, 45, 65, 70, 87]
+
+      Example 2- Customized sorting
+      public class Test {
+         public static void main(String[] args) {
+            ArrayList<Integer> marks = new ArrayList<>();
+            marks.add(70);
+            marks.add(45);
+            marks.add(10);
+            marks.add(65);
+            marks.add(20);
+            marks.add(87);
+            System.out.println(marks);
+            List sortedList = marks.stream().sorted((i1,i2)-> (i1<i2)?1: (i1>i2)?-1:0).collect(Collectors.toList());
+            System.out.println(sortedList);
+         }
+      }
+      output:
+      [70, 45, 10, 65, 20, 87]
+      [87, 70, 65, 45, 20, 10]
+
+      Example 3-
+      public class Test {
+         public static void main(String[] args) {
+            ArrayList<String> name = new ArrayList<>();
+            name.add("Anshu");
+            name.add("Ishani");
+            name.add("Rohit");
+            System.out.println(name);
+            //Default natural sorting order- ascending order
+            List sortedList = name.stream().sorted((i1, i2)-> i1.compareTo(i2)).collect(Collectors.toList());
+            //Customized sorting order- descending order
+            List sortedList1 = name.stream().sorted((i1, i2)-> -i1.compareTo(i2)).collect(Collectors.toList());
+            System.out.println(sortedList);
+            System.out.println(sortedList1);
+         }
+      }
+      output:
+      [Anshu, Ishani, Rohit]
+      [Anshu, Ishani, Rohit]
+      [Rohit, Ishani, Anshu]
+
+      Example 4-
+      public class Test {
+         public static void main(String[] args) {
+            ArrayList<String> name = new ArrayList<>();
+            name.add("Anshu");
+            name.add("Ishani");
+            name.add("Rohit");
+            System.out.println(name);
+            Comparator<String> c = (s1,s2)-> (s1.length()<s2.length())?-1:(s1.length()>s2.length())?1:0;
+            List sortedList = name.stream().sorted(c).collect(Collectors.toList());
+            System.out.println(sortedList);
+         }
+      }
+      output:
+      [Anshu, Ishani, Rohit]
+      [Anshu, Rohit, Ishani]
+
+min():
+To find the smallest element present in the stream.
+List must be sorted.
+max():
+To find the largest element present in the stream.
+List must be sorted.
+The position of numbers determine the min and max value not their values.
+      Example:
+      public class Test {
+         public static void main(String[] args) {
+            ArrayList<Integer> l = new ArrayList<>();
+            l.add(30);
+            l.add(45);
+            l.add(29);
+            l.add(54);
+            l.add(53);
+            System.out.println(l);
+            Integer minValue = l.stream().min((i1,i2)-> i1.compareTo(i2)).get();
+            System.out.println(minValue);
+            Integer maxValue = l.stream().max((i1, i2)-> i1.compareTo(i2)).get();
+            System.out.println(maxValue);
+         }
+      }
+
+forEach(Consumer c):
+If we want to print all the elements present inside ArrayList we use for each loop
+      for(Integer i1: l) {
+         System.out.println(i1);
+      }
+      We can replace it with the code below-
+      Example 1-
+      public class Test {
+         public static void main(String[] args) {
+            ArrayList<Integer> l = new ArrayList<>();
+            l.add(30);
+            l.add(45);
+            l.add(29);
+            l.add(54);
+            l.add(53);
+            l.stream().forEach(System.out::println);
+         }
+      }
+
+      Example 2- print the square of every number.
+      public class Test {
+          public static void main(String[] args) {
+              ArrayList<Integer> l = new ArrayList<>();
+              l.add(30);
+              l.add(45);
+              l.add(29);
+              l.add(54);
+              l.add(53);
+              Consumer<Integer> c = i-> System.out.println("The square of each element: " + i*i);
+              l.stream().forEach(c);
+          }
+      }
+
+toArray():
+To convert stream objects into array.
+      public class Test {
+         public static void main(String[] args) {
+            ArrayList<Integer> l = new ArrayList<>();
+            l.add(30);
+            l.add(45);
+            l.add(29);
+            l.add(54);
+            l.add(53);
+            Integer[] arr = l.stream().toArray(Integer[]::new);
+            for(Integer i1: arr) {
+               System.out.println(i1);
+            }
+         }
+      }
+      *Sample::new returns Sample object.
+      *Similarly Integer[]::new returns Integer[] object.
+      *We cannot use forEach() for arrays because streams is applicable for collection.
+      But we can convert array into streams and then apply forEach().
+      Example-
+      public class Test {
+         public static void main(String[] args) {
+            ArrayList<Integer> l = new ArrayList<>();
+            l.add(30);
+            l.add(45);
+            l.add(29);
+            l.add(54);
+            l.add(53);
+            Integer[] arr = l.stream().toArray(Integer[]::new);
+            Stream.of(arr).forEach(System.out::println);
+         }
+      }
+
+      *For any group of values we can use Stream.of() method.
+      Example-
+      public class Test {
+         public static void main(String[] args) {
+            Stream<Integer> s = Stream.of(9, 99,999, 9999, 99999);
+            s.forEach(System.out::println);
+         }
+      }
+
+Date & Time API:
+To handle Date & Time values, until 1.7v, there are many classes like Date, Calender, TimeStamp.
+These classes are not up to the mark in terms of performance.
+These classes are also not so convenient to use.
+Most of the methods inside these classes are deprecated and not recommended to use.
+Due to above problems, in 1.8v, Date & Time API was introduced.
+      Example 1- To print the current system date and time
+      public class Test {
+         public static void main(String[] args) {
+            LocalTime time = LocalTime.now();
+            System.out.println(time);
+            LocalDate date = LocalDate.now();
+            System.out.println(date);
+         }
+      }
+      output:
+      17:59:55.104935
+      2023-05-20
+
+      Example 2- Prints the day, month and year and prints the date in customized format
+      public class Test {
+         public static void main(String[] args) {
+            LocalDate date = LocalDate.now();
+            System.out.println(date);
+            int day = date.getDayOfMonth();
+            int month = date.getMonthValue();
+            int year = date.getYear();
+            System.out.println(day + "-" + month + "-" + year);
+            //This prints the date in the same format as above
+            System.out.printf("%d-%d-%d", day, month, year);
+          }
+      }
+
+      Example 3- Get the hour, minute, seconds and nano seconds value.
+      public class Test {
+         public static void main(String[] args) {
+            LocalTime time = LocalTime.now();
+            System.out.println(time);
+            int hour = time.getHour();
+            int minute = time.getMinute();
+            int second = time.getSecond();
+            int nanoSeconds = time.getNano();
+            System.out.printf("%d:%d:%d:%d", hour, minute, second, nanoSeconds);
+          }
+      }
+
+      Example 4- Prints local date and time together
+      public class Test {
+         public static void main(String[] args) {
+            LocalDateTime dateTime = LocalDateTime.now();
+            System.out.println(dateTime);
+         }
+      }
+      output:
+      2023-05-20T18:38:12.028135600
+
+      Example 5-Prints day, month, year and hour, minute, seconds, nano seconds using LocalDateTime object.
+      public class Test {
+         public static void main(String[] args) {
+            LocalDateTime dateTime = LocalDateTime.now();
+            System.out.println(dateTime);
+            int day = dateTime.getDayOfMonth();
+            int month = dateTime.getMonthValue();
+            int year = dateTime.getYear();
+            System.out.printf("Date: %d-%d-%d", day, month, year);
+            int hour = dateTime.getHour();
+            int minute = dateTime.getMinute();
+            int seconds = dateTime.getSecond();
+            int nanoSeconds = dateTime.getNano();
+            System.out.println();
+            System.out.printf("Time: %d:%d:%d:%d", hour, minute, seconds, nanoSeconds);
+         }
+      }
+      output:
+      2023-05-20T21:31:45.767773100
+      Date: 20-5-2023
+      Time: 21:31:45:767773100
+
+      Example 6- To represent a particular date and time(not current date and time)
+      Month is a class and MAY is a constant present inside it. also 05 can be entered in place of Month.MAY.
+      In the of() method we can pass as many arguments according to the requirement
+      Ex- of(year,month,day) OR of(year,month,day,hour) OR of(year,month,day,hour,minute)
+      public class ParticularDateExample {
+         public static void main(String[] args) {
+            //Printing date 12 may 1995 and time 12:45
+            LocalDateTime dateTime = LocalDateTime.of(1995, Month.MAY, 12, 12, 45);
+            System.out.println(dateTime);
+         }
+      }
+      output:
+      1995-05-12T12:45
+
+      Example 7- Date and time after a particular date
+      public class ParticularDateExample {
+         public static void main(String[] args) {
+            LocalDateTime dateTime = LocalDateTime.of(1995, Month.MAY, 12, 12,45);
+            System.out.println(dateTime);
+            System.out.println("After six months: " + dateTime.plusMonths(6));
+            System.out.println("Before six months: " + dateTime.minusMonths(6));
+         }
+      }
+      output:
+      1995-05-12T12:45
+      After six months: 1995-11-12T12:45
+      Before six months: 1994-11-12T12:45
+
+Period:
+It is a class present in Date & Time API.
+It is used to represent the quantity of time.
+If date of birth and today's date is known, we can calculate age using Period class object.
+      Example-
+      public class AgeFinder {
+         public static void main(String[] args) {
+            LocalDate dateOfBirth = LocalDate.of(1991, 04, 10);
+            LocalDate today = LocalDate.now();
+            Period p = Period.between(dateOfBirth, today);
+            System.out.printf("Your age is %d years %d months %d days ", p.getYears(), p.getMonths(), p.getDays());
+            LocalDate deathDate = LocalDate.of(1991+70, 04, 10);
+            Period p1 = Period.between(today, deathDate);
+            int totalDaysLeft = p1.getYears()*365 + p1.getMonths()*12 + p1.getDays();
+            System.out.printf("\nThe days left on the Earth: %d days", totalDaysLeft);
+         }
+      }
+      output:
+      Your age is 32 years 1 months 11 days
+      The days left on the Earth: 13645 days
+
+Year:
+      Example-
+      public class LeapYear {
+         public static void main(String[] args) {
+            Scanner sc= new Scanner(System.in);
+            System.out.println("Enter the year");
+            int n = sc.nextInt();
+            Year y = Year.of(n);
+            if(y.isLeap()) {
+               System.out.printf("%d is a leap year", n);
+            }
+            else {
+               System.out.printf("%d is not a leap year", n);
+            }
+         }
+      }
+
+ZoneId:
+To determine the zone.
+To determine the current system zone systemDefault() is called on ZoneId object.
+      Example 1-
+      public class Test {
+         public static void main(String[] args) {
+            ZoneId zone = ZoneId.systemDefault();
+            System.out.println(zone);
+         }
+      }
+      output:
+      Asia/Calcutta
+
+      Example 2- To determine the date and time in the Los Angeles zone
+      public class Test {
+         public static void main(String[] args) {
+            ZoneId la = ZoneId.of("America/Los_Angeles");
+            ZonedDateTime zonedDateTime = ZonedDateTime.now(la);
+            System.out.println(zonedDateTime);
+         }
+      }
+      output:
+      2023-05-20T13:09:18.818743400-07:00[America/Los_Angeles]
+
+      Example- To find the day of the week if a particular date is given.
+      public class DayFinder {
+         public static void main(String[] args) {
+            getDay(1995, 1, 8);
+         }
+         public static void getDay(int year,int month, int day) {
+            LocalDate localDate = LocalDate.of(year, month, day);
+            System.out.println(localDate.getDayOfWeek());
+         }
+      }
